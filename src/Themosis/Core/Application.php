@@ -103,6 +103,7 @@ class Application extends Container {
         $services = array(
 
             '\Themosis\Asset\AssetIgniterService',
+            '\Themosis\Core\AppIgniterService',
             '\Themosis\Field\FieldIgniterService',
             '\Themosis\Html\FormIgniterService',
             '\Themosis\Html\HtmlIgniterService',
@@ -203,8 +204,14 @@ class Application extends Container {
      */
     public function run()
     {
+        $middleware = apply_filters_ref_array('themosis_middleware', array(function ($request) {
+
+            return with($this)->handle($request);;
+
+        }, &$this));
+
         $request = $this['request'];
-        $response = $this->handle($request);
+        $response = $middleware($request);
         $response->sendContent();
     }
 
@@ -325,4 +332,4 @@ class Application extends Container {
 		}
 	}
 
-} 
+}
